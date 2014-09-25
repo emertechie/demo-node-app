@@ -15,7 +15,10 @@ var app = express(),
 app.use(bodyParser.urlencoded());
 app.use(expressValidator());
 
-app.post('/ticket', seureWithJwt, function(req, res) {
+// secure all routes by default:
+app.use(seureWithJwt);
+
+app.post('/ticket', function(req, res) {
     req.checkBody('status', 'Ticket status required').notEmpty();
     req.checkBody('title', 'Title required').notEmpty();
     req.checkBody('description', 'Description required').notEmpty();
@@ -41,7 +44,7 @@ app.post('/ticket', seureWithJwt, function(req, res) {
     });
 });
 
-app.get('/ticket', seureWithJwt, function(req, res) {
+app.get('/ticket', function(req, res) {
     logger.debug('Finding tickets');
     ticketService.findAll({
         limit: req.query.limit,
@@ -57,8 +60,12 @@ app.get('/ticket', seureWithJwt, function(req, res) {
 });
 
 app.use(function(err, req, res, next) {
-    logger.error(err);
-    res.status(500).send('Something went wrong there');
+    if (err.name === 'UnauthorizedError') {
+        res.send(401, 'invalid token');
+    } else {
+        logger.error(err);
+        res.status(500).send('Something went wrong there');
+    }
 });
 
 app.listen(port);
