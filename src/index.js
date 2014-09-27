@@ -2,6 +2,7 @@ var express = require('express'),
     expjwt = require('express-jwt'),
     expressValidator = require('express-validator'),
     bodyParser = require('body-parser'),
+    cors = require('cors'),
     config = require('config'),
     logging = require('./logging'),
     ticketService = require('./services/tickets');
@@ -12,7 +13,12 @@ var app = express(),
     signingSecret = config.get('jwtSigningSecret'),
     seureWithJwt = expjwt({ secret: signingSecret });
 
-app.use(bodyParser.urlencoded());
+// Allowing access from all domains here. May want to restrict that with cors options
+app.use(cors());
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 app.use(expressValidator());
 
 // secure all routes by default:
