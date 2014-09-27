@@ -10,7 +10,7 @@ var express = require('express'),
 var app = express(),
     port = process.env.PORT || 3001,
     logger = logging.createLogger('app'),
-    signingSecret = config.get('jwtSigningSecret'),
+    signingSecret = config.get('signingSecret'),
     seureWithJwt = expjwt({ secret: signingSecret });
 
 // Allowing access from all domains here. May want to restrict that with cors options
@@ -21,12 +21,12 @@ app.use(bodyParser.json());
 
 app.use(expressValidator());
 
-// secure all routes by default:
-app.use(seureWithJwt);
-
 app.get('/', function(req, res) {
     res.send('Demo node app. Nothing to see here');
 });
+
+// secure all routes below by default:
+app.use(seureWithJwt);
 
 app.post('/ticket', function(req, res) {
     req.checkBody('status', 'Ticket status required').notEmpty();
