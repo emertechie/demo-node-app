@@ -24,6 +24,10 @@ app.use(expressValidator());
 // secure all routes by default:
 app.use(seureWithJwt);
 
+app.get('/', function(req, res) {
+    res.send('Demo node app. Nothing to see here');
+});
+
 app.post('/ticket', function(req, res) {
     req.checkBody('status', 'Ticket status required').notEmpty();
     req.checkBody('title', 'Title required').notEmpty();
